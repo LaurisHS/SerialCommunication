@@ -67,3 +67,40 @@ If editing both host and device code, keep the serial protocol details in sync (
 ---
 
 If this file should incorporate specific workflow steps (CI, test harnesses, preferred board fqbn for arduino-cli, or Visual Studio target), add that data to repo root (README or CONTRIBUTING) and request an update to this file.
+
+Additional repository-specific notes (recommended additions)
+
+- SerialCommand implementation details:
+  - SERIALCOMMANDBUFFER = 32, MAXSERIALCOMMANDS = 10, MAXDELIMETER = 2 (see SerialCommand.h).
+  - readSerial() sets term = '\n' and accepts only printable characters; delimiter defaults to space.
+  - To change terminator or buffer size update SerialCommand.h/.cpp and keep sketch and host in sync.
+
+- Arduino sketch specifics:
+  - Default baudrate: 115200 (SerialCommunication.ino: Baudrate).
+  - Pin ranges used by the sketch:
+    - digital outputs: d2..d4
+    - PWM outputs: pwm9..pwm11
+    - digital inputs: d5..d7
+    - analog inputs: a0..a5
+  - analogReadDelay(A0+pin, 50000) uses wiring_analog logic from analog.c to stabilize ADC reads.
+
+- Desktop host (Windows Forms):
+  - Project: SerialCommunication\SerialCommunication.csproj. Entry point Program.Main -> Form1 (SerialCommunication\Form1.cs).
+  - UI control names to reference: comboBoxPoort (ports) and comboBoxBaudrate (baudrates).
+
+- Build and troubleshooting (explicit commands):
+  - Build solution: msbuild "SerialCommunication.slnx" /p:Configuration=Debug
+  - Build single project: msbuild "SerialCommunication\\SerialCommunication.csproj" /p:Configuration=Debug
+  - Clean: msbuild "SerialCommunication.slnx" /t:Clean
+  - Use Visual Studio 2019/2022 for full compatibility (.NET Framework 4.7.2).
+
+- Arduino (compile/upload):
+  - Compile: arduino-cli compile --fqbn <board_fqbn> SerialCommunication.ino
+  - Upload: arduino-cli upload -p <COMx> --fqbn <board_fqbn> SerialCommunication.ino
+  - Provide the target board fqbn when automating; this repo doesn't include a preferred board.
+
+- Repository housekeeping:
+  - .vs/ and SerialCommunication\\obj\\ contain editor and build artifacts — avoid committing.
+  - No automated tests or CI configured in this repo.
+
+If further clarifications or additions are desired (board fqbn suggestions, CI examples, or documenting protocol changes), indicate which area to expand.

@@ -19,28 +19,6 @@ namespace SerialCommunication
             InitializeComponent();
         }
 
-        private void DisconnectSafely(string reason = "Disconnected")
-        {
-            try
-            {
-                if (serialPortArduino.IsOpen)
-                {
-                    serialPortArduino.Close();
-                }
-            }
-            catch { }
-
-            radioButtonVerbonden.Checked = false;
-            buttonConnect.Text = "Connect";
-            if (!reason.StartsWith("Error:"))
-                labelStatus.Text = "Status: " + reason;
-            else
-                labelStatus.Text = reason;
-
-            if (timerConnectionMonitor != null)
-                timerConnectionMonitor.Enabled = false;
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
             try
@@ -76,14 +54,24 @@ namespace SerialCommunication
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
+            // abc def ghi jkl
+
             try
             {
                 if (serialPortArduino.IsOpen)
                 {
-                    DisconnectSafely("Disconnected");
+                    //Ik heb een verbinding --> gebruiker wil deze verbreken
+
+                    serialPortArduino.Close();
+
+                    radioButtonVerbonden.Checked = false;
+                    buttonConnect.Text = "Connect";
+                    labelStatus.Text = "Status: Disconnected";
                 }
                 else
                 {
+                    //Ik heb geen verbinding --> gebruiker wilt een verbinding maken
+
                     serialPortArduino.PortName = (string)comboBoxPoort.SelectedItem;
                     serialPortArduino.BaudRate = Int32.Parse((string)comboBoxBaudrate.SelectedItem);
                     serialPortArduino.DataBits = (int)numericUpDownDatabits.Value;
@@ -118,18 +106,24 @@ namespace SerialCommunication
                         radioButtonVerbonden.Checked = true;
                         buttonConnect.Text = "Disconnect";
                         labelStatus.Text = "Status: Connected";
-                        timerConnectionMonitor.Enabled = true;
                     }
                     else
                     {
-                        DisconnectSafely("Error: verkeerd antwoord");
+                        serialPortArduino.Close();
+                        labelStatus.Text = "Error: verkeerd antwoord";
                     }
+
                 }
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
+
             }
+
         }
 
         private void checkBoxDigital2_CheckedChanged(object sender, EventArgs e)
@@ -138,7 +132,8 @@ namespace SerialCommunication
             {
                 if (serialPortArduino.IsOpen)
                 {
-                    string commando;
+
+                    string commando; //set d2 high/low
                     if (checkBoxDigital2.Checked) commando = "set d2 high";
                     else commando = "set d2 low";
                     serialPortArduino.WriteLine(commando);
@@ -146,7 +141,11 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
+
             }
         }
 
@@ -156,7 +155,8 @@ namespace SerialCommunication
             {
                 if (serialPortArduino.IsOpen)
                 {
-                    string commando;
+
+                    string commando; //set d3 high/low
                     if (checkBoxDigital3.Checked) commando = "set d3 high";
                     else commando = "set d3 low";
                     serialPortArduino.WriteLine(commando);
@@ -164,7 +164,11 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
+
             }
         }
 
@@ -174,7 +178,8 @@ namespace SerialCommunication
             {
                 if (serialPortArduino.IsOpen)
                 {
-                    string commando;
+
+                    string commando; //set d4 high/low
                     if (checkBoxDigital4.Checked) commando = "set d4 high";
                     else commando = "set d4 low";
                     serialPortArduino.WriteLine(commando);
@@ -182,7 +187,11 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
+
             }
         }
 
@@ -198,7 +207,10 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
 
@@ -214,7 +226,10 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
 
@@ -230,7 +245,10 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
 
@@ -270,11 +288,15 @@ namespace SerialCommunication
                     antwoord = antwoord.TrimEnd();
                     antwoord = antwoord.Substring(4);
                     radioButtonDigital7.Checked = (antwoord == "1");
+
                 }
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
 
@@ -298,7 +320,10 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
 
@@ -310,6 +335,7 @@ namespace SerialCommunication
                 {
                     serialPortArduino.ReadExisting();
 
+                    // Read pin 0: 0..1023 → 5..45 °C (Desired temperature)
                     string commando = "get a0";
                     serialPortArduino.WriteLine(commando);
                     string antwoord = serialPortArduino.ReadLine();
@@ -324,6 +350,7 @@ namespace SerialCommunication
 
                     labelGewensteTemp.Text = temperatureDesired.ToString("F1") + " °C";
 
+                    // Read pin 1: 0..1023 → 0..500 °C (Current temperature)
                     commando = "get a1";
                     serialPortArduino.WriteLine(commando);
                     antwoord = serialPortArduino.ReadLine();
@@ -338,6 +365,8 @@ namespace SerialCommunication
 
                     labelHuidigeTemp.Text = temperatureCurrent.ToString("F1") + " °C";
 
+                    // Compare temperatures and control digital pin 2
+                    // LED turns on when current temperature < desired temperature
                     if (temperatureCurrent < temperatureDesired)
                     {
                         serialPortArduino.WriteLine("set d2 high");
@@ -350,22 +379,10 @@ namespace SerialCommunication
             }
             catch (Exception exception)
             {
-                DisconnectSafely("Error: " + exception.Message);
-            }
-        }
-
-        private void timerConnectionMonitor_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (radioButtonVerbonden.Checked && !serialPortArduino.IsOpen)
-                {
-                    DisconnectSafely("Disconnected (USB removed)");
-                }
-            }
-            catch
-            {
-                DisconnectSafely("Disconnected (connection lost)");
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
             }
         }
     }

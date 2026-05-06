@@ -833,11 +833,6 @@
             this.timerOefening5.Interval = 1000;
             this.timerOefening5.Tick += new System.EventHandler(this.timerOefening5_Tick);
             // 
-            // timerConnectionMonitor
-            // 
-            this.timerConnectionMonitor.Interval = 1000;
-            this.timerConnectionMonitor.Tick += new System.EventHandler(this.timerConnectionMonitor_Tick);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);

@@ -115,7 +115,7 @@ namespace SerialCommunication
 
                 }
             }
-            catch(Exception exception)
+            catch (Exception exception)
             {
                 labelStatus.Text = "Error: " + exception.Message;
                 serialPortArduino.Close();
@@ -252,12 +252,12 @@ namespace SerialCommunication
             }
         }
 
-  
+
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             timerOefening3.Enabled = tabControl.SelectedIndex == 3;
             timerOefening4.Enabled = tabControl.SelectedIndex == 4;
-
+            timerOefening5.Enabled = tabControl.SelectedIndex == 5;
         }
 
         private void timerOefening3_Tick(object sender, EventArgs e)
@@ -316,6 +316,65 @@ namespace SerialCommunication
 
                     int value = Int32.Parse(antwoord);
                     labelAnalog0.Text = value.ToString();
+                }
+            }
+            catch (Exception exception)
+            {
+                labelStatus.Text = "Error: " + exception.Message;
+                serialPortArduino.Close();
+                radioButtonVerbonden.Checked = false;
+                buttonConnect.Text = "Connect";
+            }
+        }
+
+        private void timerOefening5_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (serialPortArduino.IsOpen)
+                {
+                    serialPortArduino.ReadExisting();
+
+                    // Read pin 0: 0..1023 → 5..45 °C (Desired temperature)
+                    string commando = "get a0";
+                    serialPortArduino.WriteLine(commando);
+                    string antwoord = serialPortArduino.ReadLine();
+                    antwoord = antwoord.TrimEnd();
+                    antwoord = antwoord.Substring(4);
+
+                    int analogValue = Int32.Parse(antwoord);
+
+                    double slope = 40.0 / 1023.0;
+                    double offset = 5.0;
+                    double temperatureDesired = analogValue * slope + offset;
+
+                    labelGewensteTemp.Text = temperatureDesired.ToString("F1") + " °C";
+
+                    // Read pin 1: 0..1023 → 0..500 °C (Current temperature)
+                    commando = "get a1";
+                    serialPortArduino.WriteLine(commando);
+                    antwoord = serialPortArduino.ReadLine();
+                    antwoord = antwoord.TrimEnd();
+                    antwoord = antwoord.Substring(4);
+
+                    analogValue = Int32.Parse(antwoord);
+
+                    slope = 500.0 / 1023.0;
+                    offset = 0.0;
+                    double temperatureCurrent = analogValue * slope + offset;
+
+                    labelHuidigeTemp.Text = temperatureCurrent.ToString("F1") + " °C";
+
+                    // Compare temperatures and control digital pin 2
+                    // LED turns on when current temperature < desired temperature
+                    if (temperatureCurrent < temperatureDesired)
+                    {
+                        serialPortArduino.WriteLine("set d2 high");
+                    }
+                    else
+                    {
+                        serialPortArduino.WriteLine("set d2 low");
+                    }
                 }
             }
             catch (Exception exception)

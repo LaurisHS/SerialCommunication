@@ -376,6 +376,13 @@ namespace SerialCommunication
                         serialPortArduino.WriteLine("set d2 low");
                     }
                 }
+                else
+                {
+                    labelStatus.Text = "Error: USB disconnected";
+                    serialPortArduino.Close();
+                    radioButtonVerbonden.Checked = false;
+                    buttonConnect.Text = "Connect";
+                }
             }
             catch (Exception exception)
             {
